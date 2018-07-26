@@ -11,7 +11,6 @@ from voice_engine.ns import NS
 from voice_engine.kws import KWS
 from voice_engine.doa_respeaker_2mic_hat import DOA
 from pixels import pixels
-from avs.alexa import Alexa
 
 
 def main():
@@ -19,28 +18,21 @@ def main():
     ch0 = ChannelPicker(channels=src.channels, pick=0)
     ns = NS(rate=src.rate, channels=1)
     kws = KWS()
-    doa = DOA(rate=16000, chunks=50)
-    alexa = Alexa()
-
-    alexa.state_listener.on_listening = pixels.listen
-    alexa.state_listener.on_thinking = pixels.think
-    alexa.state_listener.on_speaking = pixels.speak
-    alexa.state_listener.on_finished = pixels.off
+    doa = DOA(rate=16000, chunks=40)
 
 
     # data flow between elements
     # ---------------------------
-    # src -> ns -> kws -> alexa
+    # src -> ns -> kws
     #    \
     #    doa
-    src.pipeline(ch0, ns, kws, alexa)
+    src.pipeline(ch0, ns, kws)
 
     src.link(doa)
 
     def on_detected(keyword):
         direction = doa.get_direction()
         print('detected {} at direction {}'.format(keyword, direction))
-        alexa.listen()
         pixels.wakeup(direction)
 
     kws.on_detected = on_detected
