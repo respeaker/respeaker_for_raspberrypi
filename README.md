@@ -3,8 +3,10 @@ ReSpeaker for Raspberry Pi
 
 The repository contains some examples to use ReSpeaker series mic arrays on Raspberry Pi.
 
+The examples are included in [the custom image](https://v2.fangcloud.com/share/7395fd138a1cab496fd4792fe5?folder_id=188000207913&lang=en) with pre-installed `seeed-voicecard`, `snowboy`, `voice-engine` and etc. You can flash the custom image to get started easily.
+
 ### Hardware
-ReSpeaker 2 Mic Hat, ReSpeaker 4 Mic Array or ReSpeaker 6 Mic Array (they are all pi hats) 
+ReSpeaker 2 Mic Hat, ReSpeaker 4 Mic Array or ReSpeaker 6 Mic Array (they are all pi hats)
 
 ### Software
 + snowboy for KWS (Keyword Search / Keyword Spotting)
