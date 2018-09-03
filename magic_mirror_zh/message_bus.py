@@ -18,7 +18,7 @@ class MessageBus(object):
 
         self.is_quit = False
 
-        self.url = 'http://localhost.local:8080/kalliope'
+        self.url = 'http://localhost:8080/kalliope'
 
 
     def put(self, payload, notification='KALLIOPE'):
