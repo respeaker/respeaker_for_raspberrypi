@@ -1,25 +1,30 @@
-# 中文版Magic Mirror
+# Magic Mirror with Voice Assistant
 
-[Magic Mirror](https://github.com/MichMich/MagicMirror)是一个非常受欢迎的开源项目，其目标是DIY极具科技感且可以日常使用的镜子。
-这里我们将结合Magic Mirror和出门问问的语音SDK打造一个中文语音交互的魔境。
+[Magic Mirror](https://github.com/MichMich/MagicMirror) is a super popular open source modular smart mirror project.
+In this guide, we use ReSpeaker 4 Mic Linear Array to add voice interface to a Magic Mirror.
 
-## 硬件
-1. 树莓派（Raspberry Pi 3B)
-2. ReSpeaker 4 Mic Linear Array（声卡，麦克风阵列）
-3. HDMI显示器
-4. 双向镜
-5. 外框（需要一些木材自制）
-6. SD卡
+[>>中文版](magic_mirror_zh.md)
 
-## 配置树莓派
-1. 下载[定制的pi镜像](https://v2.fangcloud.com/share/7395fd138a1cab496fd4792fe5?folder_id=188000207913&lang=en)，
-   里面内置ReSpeaker声卡驱动等，不要使用lite版本，因为需要桌面显示GUI,烧写SD卡（可以用[rufus](https://rufus.akeo.ie/)或[ether](https://etcher.io/))
-   
-2. 如果没有USB键盘或网线配合树莓派使用，在烧写完SD卡之后，第一启动SD之前，可以配置好WiFi和SSH。在SD卡的boot分区创建名为ssh的文件，以启用SSH，
-   然后在创建`wpa_cupplicant.conf`，里面的内容模板如下，更新其中的`ssid`和`psk`
+## Hardware
+1. Raspberry Pi 3B
+2. ReSpeaker 4 Mic Linear Array（sound card）
+3. HDMI display
+4. two way mirror
+5. frame
+6. SD card
+
+![](https://user-images.githubusercontent.com/948283/44985869-7d8a7480-afb4-11e8-9aed-97a93384348d.jpg)
+
+## Setup Raspberry Pi
+1. Download [a customized pi image](https://v2.fangcloud.com/share/7395fd138a1cab496fd4792fe5?folder_id=188000207913&lang=en)，
+   which includes the sound card's driver and some voice related packages (Do not use the lite version for we need desktop enviroment to show GUI).
+   We can write the image to a SD card with [rufus](https://rufus.akeo.ie/) (very tiny but only for windows) or [ether](https://etcher.io/).
+
+2. If you don't have any extra keyboard to access and configure the Raspberry Pi， you can setup WiFi configuratio and enable SSH before first time boot.
+   To do that, Juse add a file named `ssh` to the boot partition of the SD card, which enables SSH, and then create a file named `wpa_cupplicant.conf` with the following content, replace `ssid` and `psk` with yours
    
    ```
-   country=CN
+   country=GB
    ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
    update_config=1
    network={
@@ -28,18 +33,20 @@
    }
    ```
    
-3. 用SD卡启动树莓派，用树莓派的IP或者`raspberry.local`（需mDNS支持，Windows中要安装Bonjour）通过SSH访问树莓派。
-   Windows中SSH客户端可以用[putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html)
+3. Power on your Pi， use Pi's IP or `raspberry.local`（requires mDNS support， need to install Bonjour on Windows） to login via ssh
+   (On Windows, [putty](https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html) is a handy ssh client).
 
-## 安装 Magic Mirror
-1. 安装Magic Mirror软件，注意不要用apt安装node和npm，运行：
+## Install Magic Mirror
+1. To install Magic Mirror software package， just run：
 
    ```
    bash -c "$(curl -sL https://raw.githubusercontent.com/MichMich/MagicMirror/master/installers/raspberry.sh)"
    ```
-   这个命令会从github上克隆MagicMirror仓库到`~/MagicMirror`，安装node、npm和Magic Mirror的依赖。
+   This command will clone MagicMirror repository from github to `~/MagicMirror`， install node, npm and other dependencies.
+
+   >Note: Do not use `apt install` to install node and npm, node and npm in the deb repository is kind of outdated. Remove them if already installed.
    
-2. 安装 Magic Mirror 的扩展模块 MMM-Remote-Control 和 MMM-kalliope
+2. Install Magic Mirror modules: MMM-Remote-Control and MMM-kalliope
 
    ```
    cd ~/MagicMirror/modules
@@ -48,13 +55,14 @@
    cd MMM-Remote-Control
    npm install
    ```
-   然后在`~/MagicMirror/config/config.js`的`moddules`中添加 MMM-Remote-Control 和 MMM-kalliope 的配置
+   and then add the configuration of MMM-Remote-Control and MMM-kalliope to `moddules` of `~/MagicMirror/config/config.js` 
    ```
    {
        module: "MMM-kalliope",
        position: "upper_third",
        config: {
-           title: "Kalliope"
+           title: "",
+           max: 1
        }
    },
    {
@@ -64,52 +72,26 @@
        // you can hide this module afterwards from the remote control itself
    },
    ```
-   配置会在MagicMirror重启后生效。
-   可以一下命令测试发送消息到MagicMirror
+   restart MagicMirror to enable the new configuration.
+   Use the following command to test if we can send a message to MagicMirror
    ```
    curl -H "Content-Type: application/json" -X POST -d '{"notification":"KALLIOPE", "payload": "my message"}' http://localhost:8080/kalliope
    ```
 
-3. 配置天气模块
+3. Configure Weather module
 
-   镜子上可以显示天气信息，但需要调用[OpenWeatherMap](https://home.openweathermap.org)的API，所以要注册OpenWeatherMap获取API key。
-   获得key之后，填入`~/MagicMirror/config/config.js`
+   By default, a weather module using [OpenWeatherMap](https://home.openweathermap.org) is included， we need sign up OpenWeatherMap to get a API key and
+   fill the key to `~/MagicMirror/config/config.js`
    
-## 配置出门问问语音SDK
-1. 克隆 `voice-engine/wenwen`
+## Set Google Assistant
+1. Go to [Introduction to the Google Assistant Library](https://developers.google.com/assistant/sdk/guides/library/python/) to install and setup Google Assistant Library
 
-   ```
-   cd ~
-   git clone https://github.com/voice-engine/wenwen.git
-   cd wenwen
-   ```
-2. 下载[出门问问Linux SDK](https://ai.chumenwenwen.com/pages/document/intro?id=download)，把压缩包中`lib`和`.mobvoi`解压到`wenwen`目录
-
-   ```
-    wenwen
-    ├── .mobvoi
-    ├── lib
-    ├── assistant.py
-    ├── offline.py
-    └── player.py
-   ```
-3. 离线模式，运行`python offline.py`离线识别“开灯”、“关灯”、“播放音乐”等语音命令
-4. 在线模式，在https://ai.chumenwenwen.com，注册出门问问开发者帐号，创建一个应用，获得应用的KEY，并填入`wenwen/assistan.py`
-5. 运行`python wenwen/assistant.py`，用”你好问问“唤醒，然后语音对话
-
-## 将Magic Mirror与问问结合
-集成问问语音交互的代码就在这个仓库中，放在定制镜像的`~/respeaker`位置，运行以下命令进行配置
-
-```
-[ ! -d ~/respeaker ] && git clone https://github.com/respeaker/respeaker_for_raspberrypi.git ~/respeaker
-cd respeaker
-git pull origin master
-cd magic_mirror_zh
-ln -s ~/wenwen .
-```
-
-将出门问问应用的KEY填到`mirror.py`中，然后运行`python mirror.py`，就可以用“魔镜魔镜”唤醒镜子。
+2. After authorization, we can just run [mirror_with_google_assistant.py](mirror_with_google_assistant.py) to start the Google Assistant for the Mirror.
 
 
-   
-   
+![](https://user-images.githubusercontent.com/948283/44985871-7e230b00-afb4-11e8-860b-7b3ce3f57585.jpg)
+
+![](https://user-images.githubusercontent.com/948283/44985870-7e230b00-afb4-11e8-8c97-d61494bfca42.jpg)
+
+## To do
+As we are using a 4 Mic Linear Array, we are able to detect sound Direction of Arrial (DOA) which can be used to provide some creative functions. We can use beamforming to enhance a specific direction's sound.
