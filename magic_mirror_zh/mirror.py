@@ -6,17 +6,27 @@ import json
 from wenwen.assistant import Assistant
 from message_bus import MessageBus
 import wenwen.player as player
+import subprocess
 
 
 # TODO: Get a key from https://ai.chumenwenwen.com
 KEY = ''
 
 
+# Use Wio Link to open a door
+def open_door():
+    # TODO: fill your Wio Link's access token
+    access_token = ''
+    cmd_template = 'curl -k -X POST https://us.wio.seeed.io/v1/node/GenericDOutD1/onoff/{}?access_token={}'
+    cmd = cmd_template.format(0, access_token) + " && sleep 1 && " + cmd_template.format(1, access_token)
+    subprocess.Popen(cmd, shell=True)
+
+
 class Mirror(Assistant):
     def __init__(self, key=KEY):
         super(Mirror, self).__init__(key)
 
-        self.set_keywords(['开灯', '关灯', '播放音乐', '几点了', '暂停', '魔镜', '显示天气', '隐藏天气'])
+        self.set_keywords(['开灯', '关灯', '播放音乐', '几点了', '暂停', '魔镜', '显示天气', '隐藏天气', '打开门'])
         # self.set_keywords(['魔镜'])
 
         self.kws = False
@@ -43,13 +53,21 @@ class Mirror(Assistant):
                 # self.message_bus.put('>'')
                 self.kws = False
                 self.recognizer_start()
+            elif text.find('打开门') >= 0: 
+                # open door
+                self.message_bus.put('打开门')
+                open_door()
             elif text.find('开灯') >= 0:
+                # turn on light
                 pass
             elif text.find('关灯') >= 0:
+                # turn off light
                 pass
             elif text.find('显示天气') >= 0:
+                # show weather info
                 self.message_bus.put('{"action": "SHOW","module":"module_4_currentweather"}', 'REMOTE_ACTION')
             elif text.find('隐藏天气') >= 0:
+                # hide weather info
                 self.message_bus.put('{"action": "HIDE","module":"module_4_currentweather"}', 'REMOTE_ACTION')
         else:
             self.message_bus.put(text)
