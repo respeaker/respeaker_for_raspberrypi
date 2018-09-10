@@ -21,7 +21,7 @@ In this guide, we use ReSpeaker 4 Mic Linear Array to add voice interface to a M
    We can write the image to a SD card with [rufus](https://rufus.akeo.ie/) (very tiny but only for windows) or [ether](https://etcher.io/).
 
 2. If you don't have any extra keyboard to access and configure the Raspberry Pi， you can setup WiFi configuratio and enable SSH before first time boot.
-   To do that, Juse add a file named `ssh` to the boot partition of the SD card, which enables SSH, and then create a file named `wpa_cupplicant.conf` with the following content, replace `ssid` and `psk` with yours
+   To do that, Juse add a file named `ssh` to the boot partition of the SD card, which enables SSH, and then create a file named `wpa_supplicant.conf` with the following content, replace `ssid` and `psk` with yours
    
    ```
    country=GB

@@ -16,7 +16,7 @@
    里面内置ReSpeaker声卡驱动等，不要使用lite版本，因为需要桌面显示GUI,烧写SD卡（可以用[rufus](https://rufus.akeo.ie/)或[ether](https://etcher.io/))
    
 2. 如果没有USB键盘或网线配合树莓派使用，在烧写完SD卡之后，第一启动SD之前，可以配置好WiFi和SSH。在SD卡的boot分区创建名为ssh的文件，以启用SSH，
-   然后在创建`wpa_cupplicant.conf`，里面的内容模板如下，更新其中的`ssid`和`psk`
+   然后在创建`wpa_supplicant.conf`，里面的内容模板如下，更新其中的`ssid`和`psk`
    
    ```
    country=CN
