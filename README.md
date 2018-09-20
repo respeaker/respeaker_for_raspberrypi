@@ -16,6 +16,16 @@ ReSpeaker 2 Mic Hat, ReSpeaker 4 Mic Array or ReSpeaker 6 Mic Array (they are al
 + avs for alexa voice service
 + voice-engine for connecting all the elements together
 
+
+```
+pip install webrtc-audio-processing speexdsp voice-engine avs
+``
+and go to [kitt-ai/snowboy](http://github.com/kitt-ai/snowboy) to install snowboy.
+
+
+
+### Files
+
 ----------------------------------------------------------
 
 ```
